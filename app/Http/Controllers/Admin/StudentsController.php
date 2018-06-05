@@ -16,19 +16,20 @@ class StudentsController extends Controller
 {
     public function index()
     {
-
+        $this->authorize('view' , new Student);
         if(auth()->user()->hasRole('root')) {
         $students = Student::all();            
         } else { 
-        $teacher = Teacher::where('user_id' , auth()->user()->id)->get()->first();
-        $subjects = $teacher->subjects->where('students' , '!=' , '[]');
+        $teacher = auth()->user()->teacher;
+        $subjects = $teacher->subjects->where('students' , '!=' , '[]')->unique('id');
         }
         
     	return view('admin.students.index' , compact('students' , 'subjects'));
-    
+
     }
     public function create()
     {
+        $this->authorize('view' , new Student);
         if(auth()->user()->hasRole('root')) {
         $subjects = Subject::pluck('name','id');            
     } else {
@@ -80,6 +81,7 @@ class StudentsController extends Controller
     }
     public function edit(Student $student)
     {
+        $this->authorize('update' , $student);
         if(auth()->user()->hasRole('root')) {
         $subjects = Subject::pluck('name','id');            
     } else {

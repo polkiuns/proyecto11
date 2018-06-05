@@ -44,6 +44,7 @@
                             | {{$course->name}} |
                           @endforeach
                       </td>
+                      @if(auth()->user()->hasRole('root'))
                       <td>                          
                           <a href="{{route('admin.subjects.edit' , $subject)}}" title="Editar curso" class="btn btn-xs btn-info"><i class="fa fa-pencil"></i></a>
                          
@@ -53,6 +54,9 @@
                           
                           </form>
                       </td>
+                      @else 
+                      <td>No estas autorizado para realizar ninguna accion aqui</td>
+                      @endif
                     </tr>
 					@endforeach       
                 </tbody>

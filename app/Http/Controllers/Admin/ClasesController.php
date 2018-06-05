@@ -14,6 +14,7 @@ class ClasesController extends Controller
 {
     public function index()
     {
+        $this->authorize('view' , new Clase);
         if(auth()->user()->hasRole('root')) {
         $classes = Clase::all();            
         } else {
@@ -26,6 +27,7 @@ class ClasesController extends Controller
     }
     public function create()
     {
+        $this->authorize('view' , new Clase);
         if(auth()->user()->hasRole('root')) {
         $lessons = Lesson::pluck('name','id');
         $subjects = Subject::pluck('name' , 'id');
@@ -78,6 +80,7 @@ class ClasesController extends Controller
     
     public function edit(Clase $class)
     {
+        $this->authorize('update' , $class);
         if(auth()->user()->hasRole('root')) {
         $lessons = Lesson::pluck('name','id');
         } else {
@@ -123,6 +126,7 @@ class ClasesController extends Controller
     }
     public function delete(Clase $class)
     {
+        $this->authorize('delete' , $class);
         $class->delete();
 
         return back()->with('flash' , 'Curso eliminado satisfactoriamente');
@@ -130,6 +134,7 @@ class ClasesController extends Controller
 
     public function show(Clase $clase)
     {
+        $this->authorize('entrega' , $clase);
         if(auth()->user()->hasRole('root'))
         {
             $deliveries = Delivery::where('clase_id' , $clase->id)->get();

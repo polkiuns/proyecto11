@@ -13,6 +13,7 @@ class TeachersController extends Controller
 {
     public function index()
     {
+        $this->authorize('view' , new Teacher);
     	$teachers = Teacher::all();
     	return view('admin.teachers.index' , compact('teachers'));
     }
@@ -65,12 +66,13 @@ class TeachersController extends Controller
     }
     public function edit(Teacher $teacher)
     {
-
+        $this->authorize('view' , $teacher);
         $subjects = Subject::pluck('name','id');
     	return view('admin.teachers.edit' , compact('teacher' , 'subjects'));
     }
     public function update(Request $request , Teacher $teacher)
     {
+
         $request->validate([
             'name' => 'required|between:3,15',
             'surnames' => 'required|between:5,30',
@@ -107,6 +109,7 @@ class TeachersController extends Controller
     }
     public function delete(Teacher $teacher)
     {
+        $this->authorize('view' , $teacher);
         $teacher->user->delete();
         $teacher->subjects()->detach();
         $lesson = Lesson::where('teacher_id' , $teacher->id)->get();

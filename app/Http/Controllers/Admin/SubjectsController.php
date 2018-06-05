@@ -12,6 +12,7 @@ class SubjectsController extends Controller
 {
     public function index()
     {
+        $this->authorize('view' , new Subject);
         if(auth()->user()->hasRole('root')){
             $subjects = Subject::all();
         } else {
@@ -22,6 +23,7 @@ class SubjectsController extends Controller
     }
     public function create()
     {
+        $this->authorize('create' , new Subject);
     	$categories = Course::where('course_id' , '=' , null)->get();
     	$courses = Course::pluck('name','id');
         $teachers = Teacher::pluck('name' , 'id');
@@ -29,7 +31,7 @@ class SubjectsController extends Controller
     }
     public function store(Request $request)
     {
-    	
+     	
         $request->validate([
             'name' => 'required|between:3,30',
             'description' => 'required|between:3,15',
@@ -49,7 +51,7 @@ class SubjectsController extends Controller
     }
     public function edit(Subject $subject)
     {
-
+         $this->authorize('update' , $subject);
         $categories = Course::where('course_id' , '=' , null)->get();
         $courses = Course::pluck('name','id');
         $teachers = Teacher::pluck('name' , 'id');
@@ -57,6 +59,7 @@ class SubjectsController extends Controller
     }
     public function update(Request $request , Subject $subject)
     {
+        $this->authorize('update' , $subject);
     	$request->validate([
             'name' => 'required|between:3,30',
             'description' => 'required|between:3,15',
@@ -75,6 +78,7 @@ class SubjectsController extends Controller
     }
     public function delete(Subject $subject)
     {
+        $this->authorize('delete' , $subject);
         $subject->clases()->delete();
         $subject->lessons()->delete();
         $subject->students()->detach();

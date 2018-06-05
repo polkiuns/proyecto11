@@ -139,26 +139,6 @@
 
     </main><!-- /.container -->
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @elseif(auth()->user()->student->subjects->prepend(0)->pluck('id')->search($subject->id))
   <br><br><br>
     <main role="main" class="container">

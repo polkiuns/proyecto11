@@ -15,6 +15,7 @@ class CoursesController extends Controller
     }
     public function create()
     {
+        $this->authorize('create' , new Course);    
     	$categories = Course::where('course_id' , '=' , null)->get();
     	$allCategories = Course::pluck('name','id');
     	return view('admin.courses.create' , compact('allCategories' , 'categories'));
@@ -40,6 +41,7 @@ class CoursesController extends Controller
     }
     public function edit(Course $course)
     {
+        $this->authorize('view' , $course);
     	$categories = Course::where('course_id' , '=' , null)->get();
     	$allCategories = Course::pluck('name','id');
     	

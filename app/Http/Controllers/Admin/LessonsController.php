@@ -12,6 +12,7 @@ class LessonsController extends Controller
 {
     public function index()
     {
+         $this->authorize('view' , new Lesson);
         if(auth()->user()->hasRole('root')){
         $lessons = Lesson::all();           
         } else {
@@ -24,7 +25,9 @@ class LessonsController extends Controller
     }
     public function create()
     {
-    	if(auth()->user()->hasRole('root')){
+         $this->authorize('view' , new Subject);
+    	
+        if(auth()->user()->hasRole('root')){
         $categories = Lesson::where('lesson_id' , '=' , null)->get();
         $subjects = Subject::pluck('name' , 'id');
         $lessons = Lesson::pluck('name','id');            
@@ -70,6 +73,7 @@ class LessonsController extends Controller
     }
     public function edit(Lesson $lesson)
     {
+        $this->authorize('update' , $lesson);
         if(auth()->user()->hasRole('root')){
         $categories = Lesson::where('lesson_id' , '=' , null)->get();
         $subjects = Subject::pluck('name','id');            
