@@ -139,7 +139,25 @@
 
     </main><!-- /.container -->
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @elseif(auth()->user()->student->subjects->prepend(0)->pluck('id')->search($subject->id))
+  
   <br><br><br>
     <main role="main" class="container">
       <div class="row">
@@ -240,29 +258,49 @@
             </ol>
           </div>
           @if($clase->allowDelivery != 0)
+          
+
           <div class="p-3">
             <h4 class="font-italic">Entregas</h4>
             <ol class="list-unstyled mb-0">
               @if($clase->deliveries->prepend(0)->pluck('user_id')->search(auth()->user()->id))
+              
               <li>      
+                
+              @if(!$clase->deliveries->where('user_id' , auth()->user()->id)->pluck('nota')->first())
                 <div class="alert alert-danger">
               <strong>Tienes una entrega activa, si subes una se eliminara la antigua</strong>
                 </div>
+              @else
+                <div class="alert alert-danger">
+              <strong>Tu entrega ha sido corregida y se han bloqueado los botones.</strong>
+                </div>              
+              @endif
 
                 {{$clase->deliveries->where('user_id' , auth()->user()->id)->pluck('name')->first()}}
                 <img src="https://lh3.ggpht.com/hXwdHw8jKna3Ox864_sDUxkGo40b7GGq-y-uGHcb5KeCiN_eRQh_WPXmoSCOoD9KKw=s128">
+              @if(!$clase->deliveries->where('user_id' , auth()->user()->id)->pluck('nota')->first())
               <form method = "POST" action ="{{route('deliveries.delete' , $clase)}}" style="display: inline;">
               @csrf {{method_field('DELETE')}} 
                 <button onclick = "return confirm('¿Estas seguro de querer borrar este curso?')" title="Eliminar entrega" class="btn btn-xs btn-danger">Dlt</button>
               </form>
-                
+                @endif
 
                 <a href="{{route('deliveries.download' , $clase)}}" class="btn btn-success btn-xs">Dwnld</a>
                 
               </li>
+              
+  
+              @if($clase->deliveries->where('user_id' , auth()->user()->id)->pluck('nota')->first())
+              <p>Tu nota es: {{$clase->deliveries->where('user_id' , auth()->user()->id)->pluck('nota')->first()}}</p>
+              @else
+              <p>No tiene nota</p>
               @endif
+              @endif
+              @if(!$clase->deliveries->where('user_id' , auth()->user()->id)->pluck('nota')->first())
               <li><div class="dropzone" id="dropzone1"></li>
               <li><button type="submit" class="btn btn-primary btn-block" id="enviarArchivo">Subir archivo</button></li>
+              @endif
             </ol>
           </div>
           @endif

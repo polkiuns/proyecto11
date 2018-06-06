@@ -11,6 +11,7 @@ class DeliveriesController extends Controller
 {
     public function upload(Clase $clase)
     {
+        $this->authorize('control', $clase);
     	if(count($clase->deliveries)){
         foreach($clase->deliveries as $delivery)
         {
@@ -36,6 +37,7 @@ class DeliveriesController extends Controller
 
     public function delete(Clase $clase)
     {
+                $this->authorize('control', $clase);
         foreach($clase->deliveries as $delivery)
         {
         	if($delivery->user->id == auth()->user()->id) {
@@ -51,6 +53,7 @@ class DeliveriesController extends Controller
 
     public function download(Clase $clase)
     {
+                $this->authorize('control', $clase);
         foreach($clase->deliveries as $delivery)
         {
         	if($delivery->user->id == auth()->user()->id) {

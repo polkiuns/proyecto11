@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\User;
 use App\Delivery;
+use App\Clase;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class DeliveryPolicy
@@ -39,7 +40,7 @@ class DeliveryPolicy
      */
     public function create(User $user)
     {
-        //
+        return true;
     }
 
     /**
@@ -84,4 +85,5 @@ class DeliveryPolicy
             }
         }
     }
+
 }

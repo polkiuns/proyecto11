@@ -9,7 +9,7 @@ class CommentsController extends Controller
 {
     public function create(Clase $clase , Request $request)
     {
-
+        $this->authorize('create', new Comment);
         $request->validate([
             'body' => 'required|between:3,250',
         ]);
@@ -25,6 +25,7 @@ class CommentsController extends Controller
     }
     public function edit(Comment $comment, Request $request)
     {
+        $this->authorize('update', $comment);
         $request->validate([
             'bodyEditar' => 'required|between:3,250',
         ]);
@@ -35,6 +36,7 @@ class CommentsController extends Controller
     }
     public function delete(Comment $comment)
     {
+        $this->authorize('delete', $comment);
     	$comment->delete();
     	return back()->with('flash' , 'Tu comentario se ha agregado satisfactoriamente');
     }

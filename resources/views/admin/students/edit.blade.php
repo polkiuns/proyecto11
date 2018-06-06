@@ -64,7 +64,7 @@
               
 				<div class="form-group {{ $errors->has('subject_id') ? 'has-error' : '' }}">
 
-                  {!! Form::label('subject_id' , 'Agregar una categoria') !!}
+                  {!! Form::label('subject_id' , 'Agregar una asignatura') !!}
 
                   {!! Form::select('subject_id[]',$subjects, $student->subjects->pluck('id'), ['id' => 'curso','class'=>'form-control' , 'multiple' => true]) !!}
 
@@ -73,7 +73,7 @@
                 </div>
               
               <div class="form-group {{$errors->has('email') ? 'has-error' : ''}}" >
-              	{!!Form::label('email', 'Nombre del curso')!!}
+              	{!!Form::label('email', 'Email del alumno')!!}
                 {!!Form::text('email', old('email') ,['placeholder' => 'Escriba el email del alumno' , 'class' => 'form-control'])!!}
                 {!! $errors->first('email', '<span class="help-block">:message</span>')!!}     
               </div>

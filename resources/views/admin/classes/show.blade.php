@@ -19,8 +19,6 @@
 @section('content')
 
 
-
-            {{auth()->user()->teacher->clases}}
             <div class="box">
               <div class="box-header">
                 <h3 class="box-title">Listado de clases</h3>

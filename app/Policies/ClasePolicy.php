@@ -77,4 +77,20 @@ class ClasePolicy
         }
             return false;    
     }
+
+        public function control(User $user, Clase $clase)
+    {
+        if($user->hasRole('student'))
+        {
+            foreach($user->student->subjects as $subjectStudent) {
+
+                    if($subjectStudent->id == $clase->lesson->subject->id) {
+                        return true;
+                    }
+                
+            }
+            return false;
+        }
+            return false;    
+    }
 }

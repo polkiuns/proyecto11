@@ -20,8 +20,9 @@ class StudentsController extends Controller
         if(auth()->user()->hasRole('root')) {
         $students = Student::all();            
         } else { 
-        $teacher = auth()->user()->teacher;
-        $subjects = $teacher->subjects->where('students' , '!=' , '[]')->unique('id');
+        /*$teacher = auth()->user()->teacher;
+        $subjects = $teacher->subjects->where('students' , '!=' , '[]')->unique('id');*/
+        $students = Student::all();
         }
         
     	return view('admin.students.index' , compact('students' , 'subjects'));
@@ -154,7 +155,7 @@ class StudentsController extends Controller
             'email' => 'required|email', 
             'password' => 'nullable|between:3,15' ,
             'subject_id' => [
-                'required',
+                'nullable',
                 function ($attribute, $value, $fail){
                    $subject = 'App\Subject'::find($value);
                    if(!isset($subject)) {
@@ -182,23 +183,25 @@ class StudentsController extends Controller
         
         $student->user_id = $user->id;
         $student->save();
-        if(count($request->subject_id) && auth()->user()->hasRole('teacher')){
+        if(count($request->subject_id) && auth()->user()->hasRole('teacher')){ 
             foreach($request->subject_id as $subject) {
                 foreach(auth()->user()->teacher->subjects as $subjectTeacher) {
                     if($subject == $subjectTeacher->id) {
-        $student->subjects()->detach();        
+        $student->subjects()->detach($request->subject_id);        
         $student->subjects()->attach($request->subject_id);                        
-    } else {
-        return back();
-    }
+    } 
                 }
             }
+        } else if (auth()->user()->hasRole('teacher')) {
+        $student->subjects()->detach(auth()->user()->teacher->subjects);            
+        } else {
+        $student->subjects()->detach();        
+        $student->subjects()->attach($request->subject_id);           
         }
-		$student->subjects()->detach();        
-        $student->subjects()->attach($request->subject_id);
 
 
-        return back()->with('flash' , 'Profesor registrado correctamente');
+
+        return back()->with('flash' , 'Alumno registrado correctamente');
     }
     public function delete(Student $student)
     {

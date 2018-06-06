@@ -46,20 +46,10 @@ class StudentPolicy
      */
     public function update(User $user, Student $student)
     {
-        if($user->hasRole('root')) {
+        if($user->hasRole('root') || $user->hasRole('teacher')) {
             return true;
-        } else if($user->hasRole('teacher')) {
-            foreach($user->teacher->subjects as $subject) {
-                foreach($student->subjects as $subjectStudent) {
-                    if($subject->id == $subjectStudent->id) {
-                        return true;
-                    }
-                }
-            }
-            }
-        
+        } 
         return false;
-        
     }
 
     /**
@@ -73,16 +63,6 @@ class StudentPolicy
     {
         if($user->hasRole('root')) {
             return true;
-        } else if($user->hasRole('teacher')) {
-            foreach($user->teacher->subjects as $subject) {
-                foreach($student->subjects as $subjectStudent) {
-                    if($subject->id == $subjectStudent->id) {
-                        return true;
-                    }
-                }
-            }
-            }
-        
-        return false;
+        } return false;
     }
 }

@@ -46,12 +46,13 @@
                       </td>
                       <td>                       
                           <a href="{{route('admin.students.edit' , $student)}}" title="Editar curso" class="btn btn-xs btn-info"><i class="fa fa-pencil"></i></a>
-                         
+                         @if(auth()->user()->hasRole('root'))
                           <form method = "POST" action ="{{route('admin.students.delete' , $student)}}" style="display: inline;">
                           @csrf {{method_field('DELETE')}} 
                           <button onclick = "return confirm('¿Estas seguro de querer borrar este curso?')" title="Eliminar curso" class="btn btn-xs btn-danger"><i class="fa fa-times"></i></button>
                           
                           </form>
+                          @endif
                       </td>
                     </tr>
 					@endforeach
