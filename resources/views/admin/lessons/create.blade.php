@@ -29,7 +29,7 @@
             <div class="box">
             <div class="box-body">
               <div class="form-group">
-              <label class="form-control">Lista de cursos de la asignatura</label>
+              <label class="form-control">Lista de lecciones de la asignatura(Experimental)</label>
 
 
             </div>
@@ -41,7 +41,7 @@
             <div class="box">
                         <div class="box-body">
               
-              <label class="form-control">Agregar una nueva asignatura</label>
+              <label class="form-control">Crear una nueva leccion</label>
 
 
                 {!! Form::open(['route'=>'admin.lessons.store']) !!}

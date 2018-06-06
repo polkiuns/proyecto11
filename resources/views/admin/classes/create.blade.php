@@ -27,7 +27,7 @@
 @endsection
 
 @section('content')
-            
+{{$idClase}}
   <div class="row">
     {!! Form::open(['route' => 'admin.classes.store']) !!}
     @csrf
@@ -109,7 +109,6 @@
       </div>
     {!! Form::close() !!}
   </div>
-
 <script>
 Dropzone.autoDiscover = false;
 var myDropzone = new Dropzone('.dropzone' , {

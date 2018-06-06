@@ -19,7 +19,7 @@ class LessonPolicy
      */
     public function view(User $user, Lesson $lesson)
     {
-        if($user->hasRole('admin') || $user->hasRole('teacher'))
+        if($user->hasRole('root') || $user->hasRole('teacher'))
         {
             return true;
         }
@@ -47,7 +47,7 @@ class LessonPolicy
      */
     public function update(User $user, Lesson $lesson)
     {
-        if($user->hasRole('admin') || ($user->hasRole('teacher') && $lesson->teacher->id == $user->teacher->id))
+        if($user->hasRole('root') || ($user->hasRole('teacher') && $lesson->teacher->id == $user->teacher->id))
         {
             return true;
         }
@@ -63,7 +63,7 @@ class LessonPolicy
      */
     public function delete(User $user, Lesson $lesson)
     {
-        if($user->hasRole('admin') || ($user->hasRole('teacher') && $lesson->teacher->id == $user->teacher->id))
+        if($user->hasRole('root') || ($user->hasRole('teacher') && $lesson->teacher->id == $user->teacher->id))
         {
             return true;
         }

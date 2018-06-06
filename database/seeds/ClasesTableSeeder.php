@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Clase;
+use App\controlClase;
 
 class ClasesTableSeeder extends Seeder
 {
@@ -21,5 +22,8 @@ class ClasesTableSeeder extends Seeder
             $class->lesson_id = 1;
             $class->published = true;
             $class->save();
+
+            $control = new controlClase;
+            $control->save();
     }
 }

@@ -8,7 +8,7 @@ class FilesController extends Controller
 {
     public function download(File $file)
     {
-    	return $pathtoFile = public_path().$file->url;
+    	$pathtoFile = public_path().$file->url;
     	return response()->download($pathtoFile);
     }
 }

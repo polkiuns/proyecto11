@@ -65,7 +65,7 @@
                 @csrf {{method_field('PUT')}}
                   <div class="form-group {{ $errors->has('name') ? 'has-error' : '' }}">
 
-                  {!! Form::label('name' , 'Nombre del curso') !!}
+                  {!! Form::label('name' , 'Nombre de la leccion') !!}
 
                   {!! Form::text('name', $lesson->name, ['id' => 'name' ,'class'=>'form-control', 'placeholder'=>'Enter name']) !!}
 

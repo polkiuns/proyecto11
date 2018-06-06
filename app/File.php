@@ -12,4 +12,8 @@ class File extends Model
     {
     	return $this->belongsTo(Clase::class);
     }
+    public function teacher()
+    {
+    	return $this->belongsTo(Teacher::class);
+    }
 }

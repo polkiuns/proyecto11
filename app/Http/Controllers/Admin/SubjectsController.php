@@ -34,8 +34,25 @@ class SubjectsController extends Controller
      	
         $request->validate([
             'name' => 'required|between:3,30',
-            'description' => 'required|between:3,15',
-            'courses_id' => 'required'
+            'description' => 'required|between:3,250',
+            'courses_id' => [
+                'required',
+                function ($attribute, $value, $fail){
+                   $course = 'App\Course'::find($value);
+                   if(!isset($course)) {
+                    return $fail($attribute. 'No es valido');
+                   }
+                }
+            ],
+            'teacher_id' => [
+                'nullable',
+                function ($attribute, $value, $fail){
+                   $teacher = 'App\Teacher'::find($value);
+                   if(!isset($teacher)) {
+                    return $fail($attribute. 'No es valido');
+                   }
+                }
+            ]
     	]);
 
         $subject = new Subject;
@@ -43,6 +60,8 @@ class SubjectsController extends Controller
         $subject->description = $request->description;
         $subject->save();
 
+        $subject->teachers()->detach();
+        $subject->courses()->detach();
         $subject->courses()->attach($request->courses_id);
         $subject->teachers()->attach($request->teacher_id);
 
@@ -51,7 +70,7 @@ class SubjectsController extends Controller
     }
     public function edit(Subject $subject)
     {
-         $this->authorize('update' , $subject);
+        $this->authorize('update' , $subject);
         $categories = Course::where('course_id' , '=' , null)->get();
         $courses = Course::pluck('name','id');
         $teachers = Teacher::pluck('name' , 'id');

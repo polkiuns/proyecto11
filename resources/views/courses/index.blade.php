@@ -43,6 +43,10 @@
 
 				                    @endif
 
+				                    @if(count($category->subjects))
+										@include('manageSubjects',['subjects' => $category->subjects , 'course' => $category])
+				                    @endif
+
 				                </li>
 				                </h3>
 

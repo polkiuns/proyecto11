@@ -44,15 +44,34 @@ class LessonsController extends Controller
     	
         $request->validate([
             'name' => 'required|min:5|max:25',
-            'subject_id' => 'required'
+            'subject_id' => [
+                'required',
+                function ($attribute, $value, $fail){
+                   $subject = 'App\Subject'::find($value);
+                   if(!isset($subject)) {
+                    return $fail($attribute. 'No es valido');
+                   }
+                }
+            ],
+            'lesson_id' => [
+                'nullable',
+                function ($attribute, $value, $fail){
+                   $lesson = 'App\Lesson'::find($value);
+                   if(!isset($lesson)) {
+                    return $fail($attribute. 'No es valido');
+                   }
+                }
+            ]
 
     	]);
 
         $lesson = new Lesson;
         $lesson->name = $request->name;
         $lesson->subject_id = $request->subject_id;
-        if($request->lesson_id != 0){
+        if($request->lesson_id != 0 ){
             $lesson->lesson_id = $request->lesson_id;
+        } else {
+            $lesson->lesson_id = 0;
         }
         if($request->has('published')) {
             $lesson->published = true;
@@ -75,7 +94,7 @@ class LessonsController extends Controller
     {
         $this->authorize('update' , $lesson);
         if(auth()->user()->hasRole('root')){
-        $categories = Lesson::where('lesson_id' , '=' , null)->get();
+        $categories = Lesson::where('subject_id' , '=' , $lesson->subject_id)->where('lesson_id' , null)->get();
         $subjects = Subject::pluck('name','id');            
         } else {
         $teacher = Teacher::where('user_id' , auth()->user()->id)->get();
@@ -91,12 +110,46 @@ class LessonsController extends Controller
     {
     	$request->validate([
             'name' => 'required|min:5|max:25',
-            'subject_id' => 'required'
+            'subject_id' => [
+                'required',
+                function ($attribute, $value, $fail){
+                   $subject = 'App\Subject'::find($value);
+                   if(!isset($subject)) {
+                    return $fail($attribute. 'No es valido');
+                   }
+                }
+            ]        
         ]);
         
         $lesson->name = $request->name;
         $lesson->subject_id = $request->subject_id;
-        $lesson->lesson_id= $request->lesson_id;
+        if($request->has('lesson_id')){ //Pedazo de arreglo para que no peten los cursos
+            
+            if(count($lesson->childs)){
+                
+                foreach($lesson->childs as $child){
+                    
+                    if($child->id == $request->lesson_id) {
+                        $lesson->lesson_id = null;
+                    } else {
+                    if($lesson->id == $request->lesson_id) {
+                        $lesson->lesson_id = null;
+                    } else {
+                        $lesson->lesson_id = $request->lesson_id;
+                    }
+                }
+            }
+        }
+            else {
+                if($lesson->id == $request->lesson_id){
+                $lesson->lesson_id = null;
+                } else {
+                $lesson->lesson_id = $request->lesson_id;
+            }                
+            } 
+        } else {
+        $lesson->lesson_id = null;
+        }
         if($request->has('published')) {
             $lesson->published = true;
         } else {

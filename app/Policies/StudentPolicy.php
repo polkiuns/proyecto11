@@ -19,7 +19,7 @@ class StudentPolicy
      */
     public function view(User $user, Student $student)
     {
-        if($user->hasRole('admin') || $user->hasRole('teacher'))
+        if($user->hasRole('root') || $user->hasRole('teacher'))
         {
             return true;
         }
@@ -34,7 +34,7 @@ class StudentPolicy
      */
     public function create(User $user)
     {
-        //
+        
     }
 
     /**
@@ -46,10 +46,20 @@ class StudentPolicy
      */
     public function update(User $user, Student $student)
     {
-        if($user->hasRole('admin') || $user->hasRole('teacher')) {
+        if($user->hasRole('root')) {
             return true;
-        } 
+        } else if($user->hasRole('teacher')) {
+            foreach($user->teacher->subjects as $subject) {
+                foreach($student->subjects as $subjectStudent) {
+                    if($subject->id == $subjectStudent->id) {
+                        return true;
+                    }
+                }
+            }
+            }
+        
         return false;
+        
     }
 
     /**
@@ -61,6 +71,18 @@ class StudentPolicy
      */
     public function delete(User $user, Student $student)
     {
-        //
+        if($user->hasRole('root')) {
+            return true;
+        } else if($user->hasRole('teacher')) {
+            foreach($user->teacher->subjects as $subject) {
+                foreach($student->subjects as $subjectStudent) {
+                    if($subject->id == $subjectStudent->id) {
+                        return true;
+                    }
+                }
+            }
+            }
+        
+        return false;
     }
 }

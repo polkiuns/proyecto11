@@ -30,4 +30,9 @@ class Teacher extends Model
     {
         return $this->hasMany(Suscription::class);
     }
+    public function files()
+    {
+        return $this->hasMany(File::class);
+    }
+
 }

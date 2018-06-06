@@ -42,14 +42,39 @@ class StudentsController extends Controller
     {
     	
         $request->validate([
-            'name' => 'required|between:3,15',
+            'name' => [
+                'required',
+                'between:3,15',
+                'regex:/^([A-ZÁÉÍÓÚ]{1}[a-zñáéíóú]+[\s]*)+$/'
+        ],
             'surnames' => 'required|between:5,30',
-            'phone' => 'required|digits:9' ,
-            'address' => 'required|between:5,30' ,
-            'dni' => 'required|min:9|max:9' ,
+            'phone' => [
+                'required',
+                'digits:9',
+                'regex: /^((\+?34([ \t|\-])?)?[9|6|7]((\d{1}([ \t|\-])?[0-9]{3})|(\d{2}([ \t|\-])?[0-9]{2}))([ \t|\-])?[0-9]{2}([ \t|\-])?[0-9]{2})$/' 
+            ],
+            'address' => [
+                'required',
+                'between:5,30',
+                'regex:/^Calle/i'
+            ],
+            'dni' => [
+                'required',
+                'min:9',
+                'max:9',
+                'regex:/^[XYZ]?([0-9]{7,8})([A-Z])$/i' 
+            ],
             'email' => 'required|email', 
             'password' => 'required|between:3,15' ,
-            'subject_id' => 'required'
+            'subject_id' => [
+                'required',
+                function ($attribute, $value, $fail){
+                   $subject = 'App\Subject'::find($value);
+                   if(!isset($subject)) {
+                    return $fail($attribute. 'No es valido');
+                   }
+                }
+            ]
 
     	]);
 
@@ -73,12 +98,26 @@ class StudentsController extends Controller
 
         $studentRole = Role::where('name' , 'student');
 
-        $student->subjects()->attach($request->subject_id);
+
         $user->assignRole('student');
 
+        if(count($request->subject_id) && auth()->user()->hasRole('teacher')){
+            foreach($request->subject_id as $subject) {
+                foreach(auth()->user()->teacher->subjects as $subjectTeacher) {
+                    if($subject == $subjectTeacher->id) {       
+        $student->subjects()->attach($request->subject_id);                        
+    } else {
+        $user->delete();
+        return back()->with('flash' , 'Te agradeceria que no me hackeases, no te he guardado al alumno');
+    }
+                }
+            }
+        }
 
+        $student->subjects()->attach($request->subject_id);
     	return back()->with('flash' , 'Profesor registrado correctamente');
     }
+
     public function edit(Student $student)
     {
         $this->authorize('update' , $student);
@@ -96,12 +135,33 @@ class StudentsController extends Controller
         $request->validate([
             'name' => 'required|between:3,15',
             'surnames' => 'required|between:5,30',
-            'phone' => 'required|digits:9' ,
-            'address' => 'required|between:5,30' ,
-            'dni' => 'required|min:9|max:9' ,
+            'phone' => [
+                'required',
+                'digits:9',
+                'regex: /^((\+?34([ \t|\-])?)?[9|6|7]((\d{1}([ \t|\-])?[0-9]{3})|(\d{2}([ \t|\-])?[0-9]{2}))([ \t|\-])?[0-9]{2}([ \t|\-])?[0-9]{2})$/' 
+            ],
+            'address' => [
+                'required',
+                'between:5,30',
+                'regex:/^Calle/i'
+            ],
+            'dni' => [
+                'required',
+                'min:9',
+                'max:9',
+                'regex:/^[XYZ]?([0-9]{7,8})([A-Z])$/i' 
+            ],
             'email' => 'required|email', 
             'password' => 'nullable|between:3,15' ,
-            'subject_id' => 'required'
+            'subject_id' => [
+                'required',
+                function ($attribute, $value, $fail){
+                   $subject = 'App\Subject'::find($value);
+                   if(!isset($subject)) {
+                    return $fail($attribute. 'No es valido');
+                   } 
+                }
+            ]
         ]);
         $user = User::find($student->user->id);
 
@@ -122,14 +182,27 @@ class StudentsController extends Controller
         
         $student->user_id = $user->id;
         $student->save();
-
+        if(count($request->subject_id) && auth()->user()->hasRole('teacher')){
+            foreach($request->subject_id as $subject) {
+                foreach(auth()->user()->teacher->subjects as $subjectTeacher) {
+                    if($subject == $subjectTeacher->id) {
+        $student->subjects()->detach();        
+        $student->subjects()->attach($request->subject_id);                        
+    } else {
+        return back();
+    }
+                }
+            }
+        }
 		$student->subjects()->detach();        
         $student->subjects()->attach($request->subject_id);
+
 
         return back()->with('flash' , 'Profesor registrado correctamente');
     }
     public function delete(Student $student)
     {
+        $this->authorize('delete' , $student);
         $student->user->delete();
         $student->subjects()->detach();
         $student->delete();

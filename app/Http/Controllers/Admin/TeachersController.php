@@ -26,15 +26,39 @@ class TeachersController extends Controller
     {
     	
         $request->validate([
-            'name' => 'required|between:3,15',
+            'name' => [
+                'required',
+                'between:3,15',
+                'regex:/^([A-ZÁÉÍÓÚ]{1}[a-zñáéíóú]+[\s]*)+$/'
+        ],
             'surnames' => 'required|between:5,30',
-            'phone' => 'required|digits:9' ,
-            'address' => 'required|between:5,30' ,
-            'dni' => 'required|min:9|max:9' ,
+            'phone' => [
+                'required',
+                'digits:9',
+                'regex: /^((\+?34([ \t|\-])?)?[9|6|7]((\d{1}([ \t|\-])?[0-9]{3})|(\d{2}([ \t|\-])?[0-9]{2}))([ \t|\-])?[0-9]{2}([ \t|\-])?[0-9]{2})$/' 
+            ],
+            'address' => [
+                'required',
+                'between:5,30',
+                'regex:/^Calle/i'
+            ],
+            'dni' => [
+                'required',
+                'min:9',
+                'max:9',
+                'regex:/^[XYZ]?([0-9]{7,8})([A-Z])$/i' 
+            ],
             'email' => 'required|email', 
             'password' => 'required|between:3,15' ,
-            'subject_id' => 'required'
-
+            'subject_id' => [
+                'required',
+                function ($attribute, $value, $fail){
+                   $subject = 'App\Subject'::find($value);
+                   if(!isset($subject)) {
+                    return $fail($attribute. 'No es valido');
+                   }
+                }
+            ]
     	]);
 
         $teacher = new teacher;
@@ -74,14 +98,38 @@ class TeachersController extends Controller
     {
 
         $request->validate([
-            'name' => 'required|between:3,15',
+            'name' => [
+                'required',
+                'between:3,15',
+                'regex:/^([A-ZÁÉÍÓÚ]{1}[a-zñáéíóú]+[\s]*)+$/'
+        ],
             'surnames' => 'required|between:5,30',
-            'phone' => 'required|digits:9' ,
-            'address' => 'required|between:5,30' ,
-            'dni' => 'required|min:9|max:9' ,
-            'email' => 'required|email', 
+            'phone' => [
+                'required',
+                'digits:9',
+                'regex: /^((\+?34([ \t|\-])?)?[9|6|7]((\d{1}([ \t|\-])?[0-9]{3})|(\d{2}([ \t|\-])?[0-9]{2}))([ \t|\-])?[0-9]{2}([ \t|\-])?[0-9]{2})$/' 
+            ],
+            'address' => [
+                'required',
+                'between:5,30',
+                'regex:/^Calle/i'
+            ],
+            'dni' => [
+                'required',
+                'min:9',
+                'max:9',
+                'regex:/^[XYZ]?([0-9]{7,8})([A-Z])$/i' 
+            ],            'email' => 'required|email', 
             'password' => 'nullable|between:3,15' ,
-            'subject_id' => 'required'
+            'subject_id' => [
+                'required',
+                function ($attribute, $value, $fail){
+                   $subject = 'App\Subject'::find($value);
+                   if(!isset($subject)) {
+                    return $fail($attribute. 'No es valido');
+                   }
+                }
+            ]
         ]);
         $user = User::find($teacher->user->id);
 

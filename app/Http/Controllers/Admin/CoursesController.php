@@ -43,29 +43,71 @@ class CoursesController extends Controller
     {
         $this->authorize('view' , $course);
     	$categories = Course::where('course_id' , '=' , null)->get();
-    	$allCategories = Course::pluck('name','id');
+    	if(count($course->childs)){
+        $allCategories=Course::pluck('name','id')->except($course->childs->pluck('id'))->except($course->id);
+        } else {
+        $allCategories=Course::pluck('name','id')->except($course->id);
+        }
     	
     	return view('admin.courses.edit' , compact('course' , 'categories' , 'allCategories'));
+      
     }
     public function update(Request $request , Course $course)
     {
     	$request->validate([
             'name' => 'required|min:3|max:20',
-            'course_id' => 'nullable'
+            'courses_id' => [
+                'nullable',
+                function ($attribute, $value, $fail){
+                   $course = 'App\Course'::find($value);
+                   if(!isset($course)) {
+                    return $fail($attribute. 'No es valido');
+                   }
+                }
+            ]
         ]);
         $course->name = $request->name;
-        if($request->has('courses_id')){
-        $course->course_id = $request->courses_id;          
+        
+
+        if($request->has('courses_id')){ //Pedazo de arreglo para que no peten los cursos
+            
+            if(count($course->childs)){
+                
+                foreach($course->childs as $child){
+                    
+                    if($child->id == $request->courses_id) {
+                        $course->course_id = null;
+                    } else {
+                    if($course->id == $request->courses_id) {
+                        $course->course_id = null;
+                    } else {
+                        $course->course_id = $request->courses_id;
+                    }
+                }
+            }
+        }
+            else {
+                if($course->id == $request->courses_id){
+                $course->course_id = null;
+                } else {
+                $course->course_id = $request->courses_id;
+            }                
+            } 
         } else {
         $course->course_id = null;
         }
+        
+
         $course->save();
+
         return back()->with('flash' , 'Curso actualizado satisfactoriamente');
     }
     public function delete(Course $course)
     {
+        if(count($course->childs)){
+            return back()->with('error' , 'Curso eliminado satisfactoriamente');
+        }
         $course->delete();
-
         return back()->with('flash' , 'Curso eliminado satisfactoriamente');
     }
 }

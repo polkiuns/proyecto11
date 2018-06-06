@@ -19,7 +19,7 @@ class ClasePolicy
      */
     public function view(User $user, Clase $clase)
     {
-        if($user->hasRole('admin') || $user->hasRole('teacher'))
+        if($user->hasRole('root') || $user->hasRole('teacher'))
         {
             return true;
         }
@@ -46,7 +46,7 @@ class ClasePolicy
      */
     public function update(User $user, Clase $class)
     {
-        if($user->hasRole('admin') || ($user->hasRole('teacher') && $class->lesson->teacher->id == $user->teacher->id))
+        if($user->hasRole('root') || ($user->hasRole('teacher') && $class->lesson->teacher->id == $user->teacher->id))
         {
             return true;
         }
@@ -62,7 +62,7 @@ class ClasePolicy
      */
     public function delete(User $user, Clase $class)
     {
-        if($user->hasRole('admin') || ($user->hasRole('teacher') && $class->lesson->teacher->id == $user->teacher->id))
+        if($user->hasRole('root') || ($user->hasRole('teacher') && $class->lesson->teacher->id == $user->teacher->id))
         {
             return true;
         }
@@ -71,7 +71,7 @@ class ClasePolicy
 
     public function entrega(User $user, Clase $clase)
     {
-        if($user->hasRole('admin') || ($user->hasRole('teacher') && $clase->lesson->teacher->id == $user->teacher->id))
+        if($user->hasRole('root') || ($user->hasRole('teacher') && $clase->lesson->teacher->id == $user->teacher->id))
         {
             return true;
         }

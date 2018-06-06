@@ -11,7 +11,13 @@ class SubcriptionsController extends Controller
 {
     public function index()
     {
-    	$subcriptions = Subcription::all();
+        if(auth()->user()->hasRole('root')){
+            $subcriptions = Subcription::all();
+        } else {
+            $teacher = auth()->user()->teacher;
+            $subcriptions = Subcription::where('teacher_id' , $teacher->id)->get();
+        }
+    	
     	return view('admin.subcriptions' , compact('subcriptions' , 'students'));
     }
         public function accept(Subcription $subcription)

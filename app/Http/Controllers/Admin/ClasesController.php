@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use App\Clase;
 use App\Lesson;
 use App\Teacher;
 use App\Subject;
 use App\Delivery;
+use App\controlClase;
 
 class ClasesController extends Controller
 {
@@ -31,12 +33,12 @@ class ClasesController extends Controller
         if(auth()->user()->hasRole('root')) {
         $lessons = Lesson::pluck('name','id');
         $subjects = Subject::pluck('name' , 'id');
-        $idClase = Clase::pluck('id')->last();            
+        $idClase = controlClase::all()->pluck('id')->last();        
         } else {
         $teacher = Teacher::where('user_id' , auth()->user()->id)->get();
         $subjects = $teacher->first()->subjects->pluck('name' , 'id');
         $lessons = Lesson::where('teacher_id', $teacher->first()->id)->get()->pluck('name' , 'id');
-        $idClase = Clase::pluck('id')->last(); 
+        $idClase = controlClase::all()->pluck('id')->last(); 
         
         }
 
@@ -51,12 +53,21 @@ class ClasesController extends Controller
             'body' => 'required|min:10|max:500',
             'iframe' => array(
                             'nullable',
-                            //Introducir expresion regular para validar iframe
+                            'regex:/^<([a-z]+)([^<]+)*(?:>(.*)<\/\1>|\s+\/>)$/'
                                 ),
-            'lesson_id' => 'required'
+            'lesson_id' => [
+                'required',
+                function ($attribute, $value, $fail){
+                   $lesson = 'App\Lesson'::find($value);
+                   if(!isset($lesson)) {
+                    return $fail($attribute. 'No es valido');
+                   }
+                }
+            ]
     	]);
 
         $clase = new Clase;
+        $control = new controlClase;
         $clase->name = $request->name;
         $clase->url = str_slug($request->name);
         $clase->description = $request->description;
@@ -74,6 +85,7 @@ class ClasesController extends Controller
             $clase->allowDelivery = false;
         }
         $clase->save();
+        $control->save();
 
     	return back()->with('flash' , 'Asignatura creada satisfactoriamente');
     }
@@ -83,12 +95,14 @@ class ClasesController extends Controller
         $this->authorize('update' , $class);
         if(auth()->user()->hasRole('root')) {
         $lessons = Lesson::pluck('name','id');
+        $subjects = Subject::pluck('name','id');
         } else {
         $teacher = Teacher::where('user_id' , auth()->user()->id)->get();
+        $subjects = $teacher->first()->subjects->pluck('name' , 'id');
         $lessons = Lesson::where('teacher_id', $teacher->first()->id)->get()->pluck('name' , 'id');            
         }
         
-    	return view('admin.classes.edit' , compact('lessons' , 'class'));
+    	return view('admin.classes.edit' , compact('lessons' , 'class' , 'subjects'));
     }
     public function update(Request $request , Clase $class)
     {
@@ -97,10 +111,18 @@ class ClasesController extends Controller
             'name' => 'required|min:3',
             'description' => 'required|min:10|max:50',
             'body' => 'required|min:10|max:500',
-            'lesson_id' => 'required', 
+            'lesson_id' => [
+                'required',
+                function ($attribute, $value, $fail){
+                   $lesson = 'App\Lesson'::find($value);
+                   if(!isset($lesson)) {
+                    return $fail($attribute. 'No es valido');
+                   }
+                }
+            ],
             'iframe' => array(
                             'nullable',
-                            //Introducir expresion regular para validar iframe
+                            'regex:/^<([a-z]+)([^<]+)*(?:>(.*)<\/\1>|\s+\/>)$/'
                                 )            
         ]);
 
@@ -127,6 +149,11 @@ class ClasesController extends Controller
     public function delete(Clase $class)
     {
         $this->authorize('delete' , $class);
+        foreach ($class->files as $file) {
+        $fileRute = str_replace('storage', 'public', $file->url);
+        Storage::delete($fileRute);
+        $file->delete();
+        }
         $class->delete();
 
         return back()->with('flash' , 'Curso eliminado satisfactoriamente');
@@ -137,6 +164,8 @@ class ClasesController extends Controller
         $this->authorize('entrega' , $clase);
         if(auth()->user()->hasRole('root'))
         {
+            $deliveries = Delivery::where('clase_id' , $clase->id)->get();
+        } else {
             $deliveries = Delivery::where('clase_id' , $clase->id)->get();
         }
 

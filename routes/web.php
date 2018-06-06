@@ -101,6 +101,9 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => 'auth
 
 	//Rutas para archivos
 	Route::post('file/{idClase}' , 'FilesController@store')->name('admin.file.create');
+	Route::post('file/edit/{idClase}' , 'FilesController@update')->name('admin.file.update');
+	Route::delete('file/{file}' , 'FilesController@delete')->name('admin.file.delete');
+	Route::get('file/{file}' , 'FilesController@download')->name('admin.file.download');
 
 	//Rutas para entregas
 	Route::get('download/delivery/{delivery}' , 'DeliveriesController@download')->name('admin.deliveries.download');
